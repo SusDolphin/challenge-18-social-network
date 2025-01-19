@@ -1,22 +1,20 @@
 const User = require('../models/User');
 
 module.exports = {
+  // get all users
   async getUsers(req, res) {
     try {
-      const users = await User.find().populate("thoughts") 
-      .populate("friends")
+      const users = await User.find().populate("thoughts").populate("friends");
       res.json(users);
     } catch (err) {
       res.status(500).json(err);
     }
   },
+  // get a single user by ID
   async getSingleUser(req, res) {
     try {
       const user = await User.findOne({ _id: req.params.userId })
-        .select('-__v')
-        .populate("thoughts") 
-        .populate("friends")
-        ;
+        .select('-__v');
 
       if (!user) {
         return res.status(404).json({ message: 'No user with that ID' });
@@ -36,7 +34,7 @@ module.exports = {
       res.status(500).json(err);
     }
   },
-
+  // update a user
   async updateUser(req, res) {
     try {
       const user = await User.findOneAndUpdate(
@@ -55,6 +53,7 @@ module.exports = {
       res.status(500).json(err);
     }
   },
+  // delete a user
   async deleteUser(req, res) {
     try {
       const user = await User.findOneAndDelete({ _id: req.params.userId });
@@ -63,13 +62,12 @@ module.exports = {
         return res.status(404).json({ message: 'No user with this id!' });
       }
 
-  
       res.json({ message: 'User successfully deleted!' });
     } catch (err) {
       res.status(500).json(err);
     }
   },
-  // Add a video response
+  // add a friend to a user's friend list
   async addFriend(req, res) {
     try {
       const user = await User.findOneAndUpdate(
@@ -87,12 +85,12 @@ module.exports = {
       res.status(500).json(err);
     }
   },
-  // Remove video response
+  // remove a friend from a user's friend list
   async removeFriend(req, res) {
     try {
       const user = await User.findOneAndUpdate(
         { _id: req.params.userId },
-        { $pull: { friends:   req.params.friendId  } },
+        { $pull: { friends: req.params.friendId } },
         { runValidators: true, new: true }
       )
 
@@ -105,6 +103,4 @@ module.exports = {
       res.status(500).json(err);
     }
   },
-
-
 };
